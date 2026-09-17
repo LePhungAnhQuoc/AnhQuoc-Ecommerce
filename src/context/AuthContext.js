@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = 'anhquoc-store-session';
@@ -24,8 +24,19 @@ function getStoredUser() {
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(getStoredUser);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const hydrateAuth = () => {
+      const storedUser = getStoredUser();
+      setUser(storedUser);
+      setIsLoading(false);
+    };
+
+    const timeoutId = requestAnimationFrame(hydrateAuth);
+    return () => cancelAnimationFrame(timeoutId);
+  }, []);
 
   const login = async (email, password) => {
     if (!isValidEmail(email)) {

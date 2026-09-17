@@ -85,7 +85,7 @@ export default function CartPage() {
           </span>
         </div>
         <button
-          onClick={() => (user ? alert('Proceeding to Checkout...') : router.push('/login'))}
+          onClick={() => (user ? router.push('/checkout') : router.push('/login'))}
           className="rounded-lg bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700"
         >
           Checkout Now
