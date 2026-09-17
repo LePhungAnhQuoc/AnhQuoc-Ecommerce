@@ -1,14 +1,14 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useCart } from '../context/CartContext'; // Adjust path if using '@/context/CartContext'
+import { useCart } from '../context/CartContext';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Toast notification state
   const [toastProduct, setToastProduct] = useState(null);
   const [showToast, setShowToast] = useState(false);
 
@@ -37,32 +37,29 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Auto-hide toast after 3 seconds
   useEffect(() => {
     if (showToast) {
       const timer = setTimeout(() => {
         setShowToast(false);
-      }, 3000); // Notification visible for 3 seconds
+      }, 3000);
 
-      return () => clearTimeout(timer); // Clean up timer on new addition
+      return () => clearTimeout(timer);
     }
   }, [showToast, toastProduct]);
 
-  // Handler to add item and trigger toast
   const handleAddToCart = (product) => {
     addToCart(product);
     setToastProduct(product);
     setShowToast(true);
   };
 
-  if (loading) return <p className="text-center p-12 text-lg">Loading Store...</p>;
+  if (loading) return <p className="p-12 text-center text-lg">Loading Store...</p>;
 
   return (
-    <main className="max-w-6xl mx-auto p-6 relative">
-      <h1 className="text-3xl font-extrabold mb-8">Featured Products</h1>
+    <main className="relative mx-auto max-w-6xl p-6">
+      <h1 className="mb-8 text-3xl font-extrabold">Featured Products</h1>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {products.map((product) => {
           const title = product.title || product.name;
           const image = product.thumbnail || product.image || (product.images && product.images[0]);
@@ -70,23 +67,26 @@ export default function Home() {
           const price = product.price;
 
           return (
-            <div key={product.id} className="bg-white border rounded-xl p-4 shadow-sm flex flex-col justify-between">
+            <div key={product.id} className="flex flex-col justify-between rounded-xl border bg-white p-4 shadow-sm">
               <div>
                 {image && (
-                  <img
+                  <Image
                     src={image}
                     alt={title}
-                    className="w-full h-48 object-cover rounded-md mb-4"
+                    width={400}
+                    height={300}
+                    unoptimized
+                    className="mb-4 h-48 w-full rounded-md object-cover"
                   />
                 )}
-                <h2 className="text-xl font-semibold mb-2">{title}</h2>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{description}</p>
+                <h2 className="mb-2 text-xl font-semibold">{title}</h2>
+                <p className="mb-4 text-sm text-gray-600 line-clamp-2">{description}</p>
               </div>
               <div>
-                <div className="text-2xl font-bold mb-4">${price}</div>
+                <div className="mb-4 text-2xl font-bold">${price}</div>
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                  className="w-full rounded-lg bg-blue-600 py-2 font-medium text-white transition hover:bg-blue-700"
                 >
                   Add to Cart
                 </button>
@@ -96,47 +96,46 @@ export default function Home() {
         })}
       </div>
 
-      {/* Windows-style Bottom-Right Toast Notification */}
       <div
         className={`fixed bottom-5 right-5 z-50 transform transition-all duration-300 ease-in-out ${
           showToast ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0 pointer-events-none'
         }`}
       >
         {toastProduct && (
-          <div className="bg-emerald-600 text-white p-4 rounded-xl shadow-2xl border border-emerald-500 max-w-sm flex items-center gap-3">
-            {/* Product Thumbnail */}
+          <div className="flex max-w-sm items-center gap-3 rounded-xl border border-emerald-500 bg-emerald-600 p-4 text-white shadow-2xl">
             {(toastProduct.thumbnail || toastProduct.image) && (
-              <img
+              <Image
                 src={toastProduct.thumbnail || toastProduct.image}
                 alt={toastProduct.title || toastProduct.name}
-                className="w-12 h-12 object-cover rounded-lg border border-emerald-400/50 flex-shrink-0"
+                width={48}
+                height={48}
+                unoptimized
+                className="h-12 w-12 flex-shrink-0 rounded-lg border border-emerald-400/50 object-cover"
               />
             )}
 
-            {/* Notification Details */}
             <div className="flex-1 pr-2">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-xs bg-emerald-700/80 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider text-emerald-100">
+              <div className="mb-0.5 flex items-center gap-1.5">
+                <span className="rounded bg-emerald-700/80 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider text-emerald-100">
                   Added to Cart
                 </span>
               </div>
-              <p className="font-semibold text-sm line-clamp-1 text-white">
+              <p className="line-clamp-1 text-sm font-semibold text-white">
                 {toastProduct.title || toastProduct.name}
               </p>
-              <p className="text-xs text-emerald-100 font-bold">${toastProduct.price}</p>
+              <p className="text-xs font-bold text-emerald-100">${toastProduct.price}</p>
             </div>
 
-            {/* View Cart Link / Close Button */}
-            <div className="flex flex-col gap-1 items-end border-l border-emerald-500/60 pl-3">
+            <div className="flex flex-col items-end gap-1 border-l border-emerald-500/60 pl-3">
               <button
                 onClick={() => setShowToast(false)}
-                className="text-white/70 hover:text-white text-xs font-bold leading-none p-1"
+                className="p-1 text-xs font-bold leading-none text-white/70 hover:text-white"
               >
                 ✕
               </button>
               <Link
                 href="/cart"
-                className="text-xs bg-white text-emerald-800 font-bold px-2 py-1 rounded hover:bg-emerald-50 transition mt-1 whitespace-nowrap"
+                className="mt-1 whitespace-nowrap rounded bg-white px-2 py-1 text-xs font-bold text-emerald-800 transition hover:bg-emerald-50"
               >
                 View →
               </Link>
