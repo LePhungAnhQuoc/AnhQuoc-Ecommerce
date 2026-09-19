@@ -36,8 +36,8 @@ export default function CartPage() {
           const itemTotal = (price * item.quantity).toFixed(2);
 
           return (
-            <div key={item.id} className="flex items-center justify-between border-b py-4 last:border-0">
-              <div className="flex items-center gap-4">
+            <div key={item.id} className="flex flex-col gap-3 border-b py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-4">
                 {image ? (
                   <Image
                     src={image}
@@ -52,15 +52,15 @@ export default function CartPage() {
                     No image
                   </div>
                 )}
-                <div>
-                  <h3 className="font-bold text-gray-800">{title}</h3>
+                <div className="min-w-0">
+                  <h3 className="break-words font-bold text-gray-800">{title}</h3>
                   <p className="text-sm text-gray-500">
                     ${price.toFixed(2)} × {item.quantity}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between gap-4 sm:shrink-0">
                 <span className="text-lg font-semibold">${itemTotal}</span>
                 <button
                   onClick={() => removeFromCart(item.id)}
@@ -77,16 +77,16 @@ export default function CartPage() {
         })}
       </div>
 
-      <div className="flex items-center justify-between rounded-lg border bg-white p-6 shadow-sm">
-        <div>
+      <div className="flex flex-col gap-4 rounded-lg border bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex w-full items-baseline justify-between gap-4 sm:w-auto sm:justify-start">
           <span className="text-gray-600">Subtotal:</span>
-          <span className="ml-2 text-3xl font-extrabold">
+          <span className="text-3xl font-extrabold">
             ${subtotal.toFixed(2)}
           </span>
         </div>
         <button
           onClick={() => (user ? router.push('/checkout') : router.push('/login'))}
-          className="rounded-lg bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700"
+          className="w-full rounded-lg bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700 sm:w-auto"
         >
           Checkout Now
         </button>
