@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { adminEmail } from '../app/Utilities';
 
 export default function Navbar() {
   const { cart } = useCart();
@@ -19,6 +20,11 @@ export default function Navbar() {
         {!isLoading && (user ? (
           <>
             <span className="hidden text-sm text-gray-300 sm:inline">{user.email}</span>
+            {user.email === adminEmail && (
+              <Link href="/admin/products" className="rounded-lg border border-gray-600 px-3 py-2 text-sm hover:bg-gray-800">
+                Manage products
+              </Link>
+            )}
             <button
               type="button"
               onClick={logout}

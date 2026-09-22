@@ -1,3 +1,11 @@
+Accounts:
+1. User 1:
+ + email: 'demo@anhquoc.com'
+ + password: 'password123'
+2. Admin:
+ + email: 'admin@anhquoc.com'
+ + password: 'admin123'
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

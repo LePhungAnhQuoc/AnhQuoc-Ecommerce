@@ -1,3 +1,6 @@
+// Global variable
+const adminEmail = 'admin@anhquoc.com';
+
 const getFilteredData = (data, searchQuery) => {
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
@@ -23,4 +26,9 @@ const getAllValuesOfObject = (obj) => {
   return values;
 };
 
-export { getAllValuesOfObject, getFilteredData };
+const getProductThumbnail = (product) => {
+  if (!product) return '/placeholder.png';
+  return product.thumbnail || product.images?.[0] || product.image || '/placeholder.png';
+}
+
+export { getAllValuesOfObject, getFilteredData, getProductThumbnail, adminEmail };

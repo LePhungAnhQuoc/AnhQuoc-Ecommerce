@@ -15,7 +15,7 @@ export default function ProductDetailPage({ params }) {
   const [toastProduct, setToastProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [loading, setLoading] = useState(true);
-  const productDetailAPI = `https://dummyjson.com/products/${id}`;
+  const productDetailAPI = `/api/products/${id}`;
   const { user } = useAuth();
   const router = useRouter();
 

@@ -1,27 +1,22 @@
+import { createProduct, getProducts, validateProduct } from '../../../lib/products';
+
 export async function GET() {
   try {
-    const response = await fetch('https://dummyjson.com/products', {
-      headers: {
-        'Content-Type': 'application/json',
-      },  
-      next: { revalidate: 60 },
-    });
+    return Response.json(await getProducts());
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+}
 
-    if (!response.ok) {
-      return Response.json(
-        { error: 'Failed to fetch data from external provider' },
-        { status: response.status }
-      );
+export async function POST(request) {
+  try {
+    const validation = validateProduct(await request.json());
+    if (validation.error) {
+      return Response.json({ error: validation.error }, { status: 400 });
     }
 
-    const data = await response.json();
-
-    // Extract the array directly from data.products
-    return Response.json(data.products || []);
+    return Response.json(await createProduct(validation.value), { status: 201 });
   } catch (error) {
-    return Response.json(
-      { error: 'Internal Server Error', details: error.message },
-      { status: 500 }
-    );
+    return Response.json({ error: error.message }, { status: 500 });
   }
 }

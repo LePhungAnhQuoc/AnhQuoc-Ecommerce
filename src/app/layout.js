@@ -10,8 +10,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 min-h-screen text-gray-800">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-gray-50 min-h-screen text-gray-800" suppressHydrationWarning>
         <AuthProvider>
           <CartProvider>
             <Navbar />
