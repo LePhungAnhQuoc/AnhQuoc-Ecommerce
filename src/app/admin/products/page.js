@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import { useProducts } from '../../../context/ProductsContext';
 import { adminEmail, getProductThumbnail } from '../../Utilities';
 
 const emptyForm = {
@@ -17,13 +18,11 @@ const emptyForm = {
 
 export default function AdminProductsPage() {
     const { user, isLoading: authLoading } = useAuth();
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { products, isLoading: loading, hasLoaded, error: productsError, loadProducts, updateProducts } = useProducts();
     const [form, setForm] = useState(emptyForm);
     const [editingId, setEditingId] = useState(null);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
-    const productAPIUrl = '/api/products';
     const categoryOptions = [
         'Beauty',
         'Fragrances',
@@ -41,24 +40,12 @@ export default function AdminProductsPage() {
         'Womens Shoes'
     ];
 
-    const loadProducts = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(productAPIUrl);
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Unable to load products.');
-            setProducts(data);
-        } catch (error) {
-            setMessage(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
         if (user?.email !== adminEmail) return;
-        loadProducts();
-    }, [user]);
+        loadProducts().catch((loadError) => {
+            setMessage(loadError.message);
+        });
+    }, [user, loadProducts]);
 
     const updateField = (event) => {
         setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -90,9 +77,14 @@ export default function AdminProductsPage() {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unable to save product.');
 
-            await loadProducts();
+            const wasEditing = Boolean(editingId);
+            updateProducts((current) => (
+                wasEditing
+                    ? current.map((product) => product.id === data.id ? data : product)
+                    : [data, ...current]
+            ));
             resetForm();
-            setMessage(editingId ? 'Product updated successfully!' : 'Product created successfully!');
+            setMessage(wasEditing ? 'Product updated successfully!' : 'Product created successfully!');
         } catch (error) {
             setMessage(error.message);
         } finally {
@@ -124,12 +116,14 @@ export default function AdminProductsPage() {
             return;
         }
 
-        setProducts((current) => current.filter((product) => product.id !== id));
+        updateProducts((current) => current.filter((product) => product.id !== id));
         if (editingId === id) resetForm();
         setMessage('Product deleted successfully!');
     };
 
-    if (authLoading || loading) return <p className="p-12 text-center">Loading product manager...</p>;
+    if (authLoading || (user?.email === adminEmail && (loading || (!hasLoaded && !productsError)))) {
+        return <p className="p-12 text-center">Loading product manager...</p>;
+    }
 
     if (!user || user.email !== adminEmail) {
         return (
@@ -221,7 +215,11 @@ export default function AdminProductsPage() {
                     <button type="submit" disabled={saving} className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{saving ? 'Saving...' : editingId ? 'Update product' : 'Create product'}</button>
                     {editingId && <button type="button" onClick={resetForm} className="rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700">Cancel</button>}
                 </div>
-                {message && <p className="md:col-span-2 text-sm font-semibold text-slate-600">{message}</p>}
+                {(message || productsError) && (
+                    <p className={`md:col-span-2 text-sm font-semibold ${productsError && !message ? 'text-red-600' : 'text-slate-600'}`}>
+                        {message || productsError}
+                    </p>
+                )}
             </form>
 
             <section className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">

@@ -2,6 +2,7 @@ import './globals.css';
 import Navbar from '../components/Navbar';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
+import { ProductsProvider } from '../context/ProductsContext';
 
 export const metadata = {
   title: 'Next.js E-Commerce',
@@ -14,8 +15,10 @@ export default function RootLayout({ children }) {
       <body className="bg-gray-50 min-h-screen text-gray-800" suppressHydrationWarning>
         <AuthProvider>
           <CartProvider>
-            <Navbar />
-            {children}
+            <ProductsProvider>
+              <Navbar />
+              {children}
+            </ProductsProvider>
           </CartProvider>
         </AuthProvider>
       </body>

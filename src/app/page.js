@@ -4,40 +4,21 @@ import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductsContext';
 import Toast from '../components/Toast';
 import { getFilteredData } from './Utilities';
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-
   const [toastProduct, setToastProduct] = useState(null);
-
   const { addToCart } = useCart();
+  const { products, isLoading, hasLoaded, error, loadProducts } = useProducts();
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const res = await fetch('/api/products');
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else if (Array.isArray(data.products)) {
-          setProducts(data.products);
-        } else {
-          setProducts([]);
-        }
-      } catch (err) {
-        console.error('Failed to load products', err);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, []);
+    loadProducts().catch((loadError) => {
+      console.error('Failed to load products', loadError);
+    });
+  }, [loadProducts]);
 
   const handleAddToCart = (product) => {
     addToCart(product);
@@ -48,7 +29,8 @@ export default function Home() {
     return getFilteredData(products, searchQuery);
   }, [products, searchQuery]);
 
-  if (loading) return <p className="p-12 text-center text-lg">Loading Store...</p>;
+  if (isLoading || (!hasLoaded && !error)) return <p className="p-12 text-center text-lg">Loading Store...</p>;
+  if (error) return <p role="alert" className="p-12 text-center text-red-700">Unable to load products: {error}</p>;
 
   return (
     <main className="relative mx-auto max-w-6xl p-6">

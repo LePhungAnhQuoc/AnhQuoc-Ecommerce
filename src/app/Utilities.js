@@ -1,5 +1,6 @@
 // Global variable
 const adminEmail = 'admin@anhquoc.com';
+const adminURL = '/admin';
 
 const getFilteredData = (data, searchQuery) => {
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -31,4 +32,4 @@ const getProductThumbnail = (product) => {
   return product.thumbnail || product.images?.[0] || product.image || '/placeholder.png';
 }
 
-export { getAllValuesOfObject, getFilteredData, getProductThumbnail, adminEmail };
+export { getAllValuesOfObject, getFilteredData, getProductThumbnail, adminEmail, adminURL };
